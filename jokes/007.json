@@ -1,0 +1,5 @@
+{
+  "id": "007",
+  "setup": "Why do GNAP Auth Servers make terrible friends?",
+  "punchline": "Because every single time you ask them a simple question, they demand a full grant negotiation and won't speak to you without an access token."
+}

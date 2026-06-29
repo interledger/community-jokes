@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,400;0,600;0,700;1,400&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a0f;
+  --foreground: #ffffff;
+
+  /* ILF brand colors */
+  --color-vision: #6500d8;
+  --color-tech: #007777;
+  --color-mission: #cf2801;
+  --color-values: #d80068;
+
+  /* Logo palette */
+  --color-purple-dark: #825282;
+  --color-purple-mid: #8075b3;
+  --color-teal-dark: #2e9c86;
+  --color-teal-mid: #56b7b5;
+  --color-teal-light: #80d4be;
+  --color-coral: #ff7a7f;
+  --color-orange: #ff9852;
+  --color-green: #68c180;
+  --color-blue-light: #a3bedc;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: 'Titillium Web', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Titillium Web', system-ui, -apple-system, sans-serif;
+  background-color: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+}
