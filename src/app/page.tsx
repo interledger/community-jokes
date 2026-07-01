@@ -4,11 +4,18 @@ import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import SplashScreen from "./components/SplashScreen";
 import JokeCard from "./components/JokeCard";
+import MemeCard from "./components/MemeCard";
 
 interface Joke {
   id: string;
   setup: string;
   punchline: string;
+}
+
+interface Meme {
+  filename: string;
+  src: string;
+  id: string;
 }
 
 export default function Home() {
@@ -17,6 +24,9 @@ export default function Home() {
   const [currentJoke, setCurrentJoke] = useState<Joke | null>(null);
   const [jokeKey, setJokeKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [memes, setMemes] = useState<Meme[]>([]);
+  const [currentMeme, setCurrentMeme] = useState<Meme | null>(null);
+  const [memeKey, setMemeKey] = useState(0);
 
   useEffect(() => {
     fetch("/api/jokes")
@@ -28,6 +38,9 @@ export default function Home() {
         }
         setLoading(false);
       });
+    fetch("/api/memes")
+      .then((r) => r.json())
+      .then(({ memes }) => setMemes(memes));
   }, []);
 
   const pickRandom = useCallback(() => {
@@ -36,6 +49,13 @@ export default function Home() {
     setCurrentJoke(next);
     setJokeKey((k) => k + 1);
   }, [jokes]);
+
+  const pickRandomMeme = useCallback(() => {
+    if (memes.length === 0) return;
+    const next = memes[Math.floor(Math.random() * memes.length)];
+    setCurrentMeme(next);
+    setMemeKey((k) => k + 1);
+  }, [memes]);
 
   return (
     <>
@@ -163,35 +183,79 @@ export default function Home() {
             )
           )}
 
-          {/* Random button */}
-          {!loading && jokes.length > 0 && (
-            <button
-              onClick={pickRandom}
-              style={{
-                background: "linear-gradient(135deg, #6500d8, #56b7b5)",
-                border: "none",
-                borderRadius: "999px",
-                padding: "0.85rem 2.5rem",
-                color: "#fff",
-                fontSize: "1rem",
-                fontFamily: "'Titillium Web', sans-serif",
-                fontWeight: 700,
-                letterSpacing: "0.05em",
-                cursor: "pointer",
-                transition: "transform 0.15s ease, opacity 0.15s ease",
-                boxShadow: "0 4px 24px rgba(101,0,216,0.35)",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.04)";
-                (e.currentTarget as HTMLButtonElement).style.opacity = "0.9";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-                (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-              }}
-            >
-              🎲 Random Joke
-            </button>
+          {/* Meme card */}
+          {currentMeme && (
+            <div key={memeKey} style={{ width: "100%", animation: "slideIn 0.4s ease" }}>
+              <MemeCard
+                src={currentMeme.src}
+                id={currentMeme.id}
+                totalMemes={memes.length}
+              />
+            </div>
+          )}
+
+          {/* Buttons */}
+          {!loading && (jokes.length > 0 || memes.length > 0) && (
+            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
+              {jokes.length > 0 && (
+                <button
+                  onClick={pickRandom}
+                  style={{
+                    background: "linear-gradient(135deg, #6500d8, #56b7b5)",
+                    border: "none",
+                    borderRadius: "999px",
+                    padding: "0.85rem 2.5rem",
+                    color: "#fff",
+                    fontSize: "1rem",
+                    fontFamily: "'Titillium Web', sans-serif",
+                    fontWeight: 700,
+                    letterSpacing: "0.05em",
+                    cursor: "pointer",
+                    transition: "transform 0.15s ease, opacity 0.15s ease",
+                    boxShadow: "0 4px 24px rgba(101,0,216,0.35)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.04)";
+                    (e.currentTarget as HTMLButtonElement).style.opacity = "0.9";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
+                    (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                  }}
+                >
+                  🎲 Random Joke
+                </button>
+              )}
+              {memes.length > 0 && (
+                <button
+                  onClick={pickRandomMeme}
+                  style={{
+                    background: "linear-gradient(135deg, #ff7a7f, #ff9852)",
+                    border: "none",
+                    borderRadius: "999px",
+                    padding: "0.85rem 2.5rem",
+                    color: "#fff",
+                    fontSize: "1rem",
+                    fontFamily: "'Titillium Web', sans-serif",
+                    fontWeight: 700,
+                    letterSpacing: "0.05em",
+                    cursor: "pointer",
+                    transition: "transform 0.15s ease, opacity 0.15s ease",
+                    boxShadow: "0 4px 24px rgba(255,122,127,0.35)",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.04)";
+                    (e.currentTarget as HTMLButtonElement).style.opacity = "0.9";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
+                    (e.currentTarget as HTMLButtonElement).style.opacity = "1";
+                  }}
+                >
+                  🖼️ Random Meme
+                </button>
+              )}
+            </div>
           )}
 
           {/* Footer */}

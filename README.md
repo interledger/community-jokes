@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Community Jokes
 
-## Getting Started
+A collection of jokes and memes submitted by the Interledger community. Got something to share? Follow the steps below to add it.
 
-First, run the development server:
+## How to contribute a joke
+
+### 1. Fork and clone the repository
+
+Go to [github.com/interledger/community-jokes](https://github.com/interledger/community-jokes) and click **Fork** in the top-right corner to create your own copy of the repo.
+
+Then clone your fork locally:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone git@github.com:<your-username>/community-jokes.git
+cd community-jokes
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Create a branch
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+git checkout -b add-my-joke
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Add your joke file
 
-## Learn More
+Jokes live in the `jokes/` directory. Each joke is its own JSON file named with a zero-padded three-digit number — check what the highest number currently is and add the next one.
 
-To learn more about Next.js, take a look at the following resources:
+For example, if `020.json` is the last file, create `021.json`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```json
+{
+  "id": "021",
+  "setup": "Why don't scientists trust atoms?",
+  "punchline": "Because they make up everything."
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Formatting rules:**
 
-## Deploy on Vercel
+- The filename and `id` value must match (e.g. file `021.json` → `"id": "021"`).
+- `setup` is the question or premise of the joke.
+- `punchline` is the answer or payoff.
+- Both `setup` and `punchline` must be non-empty strings.
+- Keep it family-friendly and kind — no jokes that punch down or target specific people or groups.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4. Commit and push
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+git add jokes/021.json
+git commit -m "add joke 021"
+git push origin add-my-joke
+```
+
+### 5. Open a pull request
+
+1. Go to your fork on GitHub (`github.com/<your-username>/community-jokes`).
+2. Click the **Compare & pull request** button that appears after your push.
+3. Set the base repository to `interledger/community-jokes` and the base branch to `main`.
+4. Give your PR a short title like `Add joke 021`.
+5. Click **Create pull request**.
+
+A maintainer will review and merge it. That's it — thanks for contributing!
+
+## How to contribute a meme
+
+### 1. Fork and clone the repository
+
+Same first two steps as above — fork on GitHub, clone your fork, and create a branch:
+
+```bash
+git clone git@github.com:<your-username>/community-jokes.git
+cd community-jokes
+git checkout -b add-my-meme
+```
+
+### 2. Add your image file
+
+Memes live in the `public/memes/` directory. Name your file with a zero-padded three-digit number and a lowercase extension — check what the highest number currently is and use the next one.
+
+For example, if `055.png` is the last file, add `056.png` (or `056.jpg`, etc.):
+
+```
+public/memes/056.png
+```
+
+**Formatting rules:**
+
+- Supported formats: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`.
+- Use a lowercase extension (`.jpg` not `.JPG`).
+- File name must be a zero-padded three-digit number, e.g. `056.png`.
+- Keep it family-friendly and kind — no images that punch down or target specific people or groups.
+
+### 3. Commit and push
+
+```bash
+git add public/memes/056.png
+git commit -m "add meme 056"
+git push origin add-my-meme
+```
+
+### 4. Open a pull request
+
+1. Go to your fork on GitHub (`github.com/<your-username>/community-jokes`).
+2. Click the **Compare & pull request** button that appears after your push.
+3. Set the base repository to `interledger/community-jokes` and the base branch to `main`.
+4. Give your PR a short title like `Add meme 056`.
+5. Click **Create pull request**.
+
+A maintainer will review and merge it. Thanks for sharing the laughs!
