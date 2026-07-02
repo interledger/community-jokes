@@ -25,6 +25,7 @@ interface HomeClientProps {
 
 export default function HomeClient({ jokes, memes }: HomeClientProps) {
   const [showSplash, setShowSplash] = useState(true);
+  const [mode, setMode] = useState<"joke" | "meme">("joke");
   const [currentJoke, setCurrentJoke] = useState<Joke | null>(null);
   const [jokeKey, setJokeKey] = useState(0);
   const [currentMeme, setCurrentMeme] = useState<Meme | null>(null);
@@ -38,12 +39,14 @@ export default function HomeClient({ jokes, memes }: HomeClientProps) {
 
   const pickRandom = useCallback(() => {
     if (jokes.length === 0) return;
+    setMode("joke");
     setCurrentJoke(jokes[Math.floor(Math.random() * jokes.length)]);
     setJokeKey((k) => k + 1);
   }, [jokes]);
 
   const pickRandomMeme = useCallback(() => {
     if (memes.length === 0) return;
+    setMode("meme");
     setCurrentMeme(memes[Math.floor(Math.random() * memes.length)]);
     setMemeKey((k) => k + 1);
   }, [memes]);
@@ -135,37 +138,18 @@ export default function HomeClient({ jokes, memes }: HomeClientProps) {
             </p>
           </div>
 
-          {/* Joke card */}
-          {jokes.length === 0 ? (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "16px",
-                padding: "3rem",
-                textAlign: "center",
-                color: "rgba(255,255,255,0.5)",
-              }}
-            >
-              <p style={{ fontSize: "1.2rem", margin: "0 0 0.5rem" }}>No jokes yet!</p>
-              <p style={{ fontSize: "0.9rem", margin: 0 }}>
-                Add JSON files to the <code style={{ color: "#80d4be" }}>jokes/</code> folder to get started.
-              </p>
+          {/* Active card */}
+          {mode === "joke" && currentJoke && (
+            <div key={jokeKey} style={{ width: "100%", animation: "slideIn 0.4s ease" }}>
+              <JokeCard
+                joke={currentJoke}
+                jokeNumber={parseInt(currentJoke.id)}
+                totalJokes={jokes.length}
+              />
             </div>
-          ) : (
-            currentJoke && (
-              <div key={jokeKey} style={{ width: "100%", animation: "slideIn 0.4s ease" }}>
-                <JokeCard
-                  joke={currentJoke}
-                  jokeNumber={parseInt(currentJoke.id)}
-                  totalJokes={jokes.length}
-                />
-              </div>
-            )
           )}
 
-          {/* Meme card */}
-          {currentMeme && (
+          {mode === "meme" && currentMeme && (
             <div key={memeKey} style={{ width: "100%", animation: "slideIn 0.4s ease" }}>
               <MemeCard
                 src={currentMeme.src}
