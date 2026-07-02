@@ -1,10 +1,8 @@
-"use client";
+import fs from "fs";
+import path from "path";
+import HomeClient from "./components/HomeClient";
 
-import { useEffect, useState, useCallback } from "react";
-import Image from "next/image";
-import SplashScreen from "./components/SplashScreen";
-import JokeCard from "./components/JokeCard";
-import MemeCard from "./components/MemeCard";
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".gif", ".webp"]);
 
 interface Joke {
   id: string;
@@ -18,266 +16,40 @@ interface Meme {
   id: string;
 }
 
-export default function Home() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [jokes, setJokes] = useState<Joke[]>([]);
-  const [currentJoke, setCurrentJoke] = useState<Joke | null>(null);
-  const [jokeKey, setJokeKey] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [memes, setMemes] = useState<Meme[]>([]);
-  const [currentMeme, setCurrentMeme] = useState<Meme | null>(null);
-  const [memeKey, setMemeKey] = useState(0);
+function getJokes(): Joke[] {
+  const jokesDir = path.join(process.cwd(), "jokes");
+  try {
+    const files = fs
+      .readdirSync(jokesDir)
+      .filter((f) => f.endsWith(".json"))
+      .sort();
+    return files.map((file) =>
+      JSON.parse(fs.readFileSync(path.join(jokesDir, file), "utf-8"))
+    );
+  } catch {
+    return [];
+  }
+}
 
-  useEffect(() => {
-    fetch("/api/jokes")
-      .then((r) => r.json())
-      .then(({ jokes }) => {
-        setJokes(jokes);
-        if (jokes.length > 0) {
-          setCurrentJoke(jokes[Math.floor(Math.random() * jokes.length)]);
-        }
-        setLoading(false);
-      });
-    fetch("/api/memes")
-      .then((r) => r.json())
-      .then(({ memes }) => setMemes(memes));
-  }, []);
+function getMemes(): Meme[] {
+  const memesDir = path.join(process.cwd(), "public", "memes");
+  try {
+    const files = fs
+      .readdirSync(memesDir)
+      .filter((f) => IMAGE_EXTENSIONS.has(path.extname(f).toLowerCase()))
+      .sort();
+    return files.map((filename) => ({
+      filename,
+      src: `/memes/${filename}`,
+      id: path.parse(filename).name,
+    }));
+  } catch {
+    return [];
+  }
+}
 
-  const pickRandom = useCallback(() => {
-    if (jokes.length === 0) return;
-    const next = jokes[Math.floor(Math.random() * jokes.length)];
-    setCurrentJoke(next);
-    setJokeKey((k) => k + 1);
-  }, [jokes]);
-
-  const pickRandomMeme = useCallback(() => {
-    if (memes.length === 0) return;
-    const next = memes[Math.floor(Math.random() * memes.length)];
-    setCurrentMeme(next);
-    setMemeKey((k) => k + 1);
-  }, [memes]);
-
-  return (
-    <>
-      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
-
-      <main
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "2rem",
-          position: "relative",
-          fontFamily: "'Titillium Web', sans-serif",
-          opacity: showSplash ? 0 : 1,
-          transition: "opacity 0.5s ease 0.2s",
-        }}
-      >
-        {/* Background glow */}
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            pointerEvents: "none",
-            zIndex: 0,
-            background:
-              "radial-gradient(ellipse at 30% 20%, rgba(101,0,216,0.12) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(86,183,181,0.1) 0%, transparent 50%)",
-          }}
-        />
-
-        {/* Content */}
-        <div
-          style={{
-            position: "relative",
-            zIndex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "2rem",
-            width: "100%",
-            maxWidth: "640px",
-          }}
-        >
-          {/* Header */}
-          <div style={{ textAlign: "center" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.75rem",
-                marginBottom: "0.5rem",
-              }}
-            >
-              <Image
-                src="/ilf-logo.svg"
-                alt="ILF Logo"
-                width={40}
-                height={40}
-                style={{ objectFit: "contain" }}
-              />
-              <h1
-                style={{
-                  fontSize: "1.8rem",
-                  fontWeight: 700,
-                  margin: 0,
-                  color: "#fff",
-                  letterSpacing: "0.02em",
-                }}
-              >
-                ILF Community Jokes
-              </h1>
-            </div>
-            <p
-              style={{
-                margin: 0,
-                color: "rgba(255,255,255,0.4)",
-                fontSize: "0.85rem",
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                fontWeight: 600,
-              }}
-            >
-              {jokes.length} joke{jokes.length !== 1 ? "s" : ""} in the ledger
-            </p>
-          </div>
-
-          {/* Joke card */}
-          {loading ? (
-            <div
-              style={{
-                color: "rgba(255,255,255,0.3)",
-                fontSize: "1rem",
-                padding: "3rem",
-              }}
-            >
-              Loading...
-            </div>
-          ) : jokes.length === 0 ? (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: "16px",
-                padding: "3rem",
-                textAlign: "center",
-                color: "rgba(255,255,255,0.5)",
-              }}
-            >
-              <p style={{ fontSize: "1.2rem", margin: "0 0 0.5rem" }}>No jokes yet!</p>
-              <p style={{ fontSize: "0.9rem", margin: 0 }}>
-                Add JSON files to the <code style={{ color: "#80d4be" }}>jokes/</code> folder to get started.
-              </p>
-            </div>
-          ) : (
-            currentJoke && (
-              <div key={jokeKey} style={{ width: "100%", animation: "slideIn 0.4s ease" }}>
-                <JokeCard
-                  joke={currentJoke}
-                  jokeNumber={parseInt(currentJoke.id)}
-                  totalJokes={jokes.length}
-                />
-              </div>
-            )
-          )}
-
-          {/* Meme card */}
-          {currentMeme && (
-            <div key={memeKey} style={{ width: "100%", animation: "slideIn 0.4s ease" }}>
-              <MemeCard
-                src={currentMeme.src}
-                id={currentMeme.id}
-                totalMemes={memes.length}
-              />
-            </div>
-          )}
-
-          {/* Buttons */}
-          {!loading && (jokes.length > 0 || memes.length > 0) && (
-            <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
-              {jokes.length > 0 && (
-                <button
-                  onClick={pickRandom}
-                  style={{
-                    background: "linear-gradient(135deg, #6500d8, #56b7b5)",
-                    border: "none",
-                    borderRadius: "999px",
-                    padding: "0.85rem 2.5rem",
-                    color: "#fff",
-                    fontSize: "1rem",
-                    fontFamily: "'Titillium Web', sans-serif",
-                    fontWeight: 700,
-                    letterSpacing: "0.05em",
-                    cursor: "pointer",
-                    transition: "transform 0.15s ease, opacity 0.15s ease",
-                    boxShadow: "0 4px 24px rgba(101,0,216,0.35)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.04)";
-                    (e.currentTarget as HTMLButtonElement).style.opacity = "0.9";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-                    (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-                  }}
-                >
-                  🎲 Random Joke
-                </button>
-              )}
-              {memes.length > 0 && (
-                <button
-                  onClick={pickRandomMeme}
-                  style={{
-                    background: "linear-gradient(135deg, #ff7a7f, #ff9852)",
-                    border: "none",
-                    borderRadius: "999px",
-                    padding: "0.85rem 2.5rem",
-                    color: "#fff",
-                    fontSize: "1rem",
-                    fontFamily: "'Titillium Web', sans-serif",
-                    fontWeight: 700,
-                    letterSpacing: "0.05em",
-                    cursor: "pointer",
-                    transition: "transform 0.15s ease, opacity 0.15s ease",
-                    boxShadow: "0 4px 24px rgba(255,122,127,0.35)",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.04)";
-                    (e.currentTarget as HTMLButtonElement).style.opacity = "0.9";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)";
-                    (e.currentTarget as HTMLButtonElement).style.opacity = "1";
-                  }}
-                >
-                  🖼️ Random Meme
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Footer */}
-          <p
-            style={{
-              color: "rgba(255,255,255,0.2)",
-              fontSize: "0.75rem",
-              margin: 0,
-              letterSpacing: "0.05em",
-            }}
-          >
-            Interledger Foundation · Community Edition
-          </p>
-        </div>
-
-        <style>{`
-          @keyframes slideIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-        `}</style>
-      </main>
-    </>
-  );
+export default function Page() {
+  const jokes = getJokes();
+  const memes = getMemes();
+  return <HomeClient jokes={jokes} memes={memes} />;
 }
