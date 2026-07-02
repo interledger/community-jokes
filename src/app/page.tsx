@@ -40,7 +40,7 @@ function getMemes(): Meme[] {
       .sort();
     return files.map((filename) => ({
       filename,
-      src: `/memes/${filename}`,
+      src: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/memes/${filename}`,
       id: path.parse(filename).name,
     }));
   } catch {

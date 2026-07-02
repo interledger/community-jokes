@@ -95,7 +95,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
         }}
       >
         <Image
-          src="/ilf-logo.svg"
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ilf-logo.svg`}
           alt="Interledger Foundation"
           fill
           priority

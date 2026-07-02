@@ -103,7 +103,7 @@ export default function HomeClient({ jokes, memes }: HomeClientProps) {
               }}
             >
               <Image
-                src="/ilf-logo.svg"
+                src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/ilf-logo.svg`}
                 alt="ILF Logo"
                 width={40}
                 height={40}
