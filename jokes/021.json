@@ -1,0 +1,5 @@
+{
+  "id": "021",
+  "setup": "Why was the ILP packet always stressed?",
+  "punchline": "It had an expiry time, and every connector on the route was adding latency."
+}

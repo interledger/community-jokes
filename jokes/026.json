@@ -1,0 +1,5 @@
+{
+  "id": "026",
+  "setup": "How do two ILP connectors start a relationship?",
+  "punchline": "They exchange ILP addresses, agree on a max packet amount, and extend bilateral credit. It's the most formal first date in fintech."
+}
